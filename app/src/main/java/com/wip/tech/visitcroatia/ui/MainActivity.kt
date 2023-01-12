@@ -1,7 +1,8 @@
-package com.wip.tech.visitcroatia
+package com.wip.tech.visitcroatia.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.wip.tech.visitcroatia.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
