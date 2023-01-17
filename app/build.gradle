@@ -31,13 +31,12 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
 }
 
 dependencies {
-
 
 
     implementation 'androidx.core:core-ktx:1.7.0'
@@ -46,11 +45,13 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     //Navigation
-    def  nav_version = "2.5.3"
+    def nav_version = "2.5.3"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-
+    //picasso LoadImages
+    implementation 'com.squareup.picasso:picasso:2.8'
+    implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
