@@ -1,11 +1,15 @@
 package com.wip.tech.visitcroatia.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.navArgs
 import com.squareup.picasso.Picasso
+import com.wip.tech.visitcroatia.R
 import com.wip.tech.visitcroatia.data.Attraction
 import com.wip.tech.visitcroatia.databinding.FragmentAttractionDetailsBinding
 
@@ -28,6 +32,11 @@ class AttractionDetailsFragment : BaseFragment() {
         return binding.root
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -36,14 +45,47 @@ class AttractionDetailsFragment : BaseFragment() {
         Picasso.get().load(attraction.image_urls).into(binding.headerImageView)
         binding.monthsToVisitTextView.text = attraction.months_to_visit
         binding.numberOfFactsTextView.text = "${attraction.facts.size}facts"
-        binding.numberOfFactsTextView.setOnClickListener{
+        binding.numberOfFactsTextView.setOnClickListener {
             //TODO
         }
-
+        setMenu()
     }
 
+
+    private fun setMenu(){
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_attraction_detail, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.menuItemLocation -> {
+                        setGoogleMaps()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun setGoogleMaps(){
+        val uri =
+            Uri.parse(
+                "geo:${attraction.location.latitude}," +
+                        "${attraction.location.longitude}?z=9&q=${attraction.title}"
+            )
+        val mapIntent = Intent(Intent.ACTION_VIEW, uri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        startActivity(mapIntent)
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 }
