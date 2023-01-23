@@ -23,6 +23,8 @@
         android:name="com.wip.tech.visitcroatia.ui.fragments.AttractionDetailsFragment"
         android:label="Attraction Details"
         tools:layout="@layout/fragment_attraction_details" >
+
+<!--        <deepLink app:uri="https://www.google.com"/>-->
         <argument
             android:name="attractionId"
             app:argType="string" />

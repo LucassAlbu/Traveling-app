@@ -1,5 +1,6 @@
 package com.wip.tech.visitcroatia.ui.fragments
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -20,9 +21,10 @@ class AttractionDetailsFragment : BaseFragment() {
 
     private val safeArgs: AttractionDetailsFragmentArgs by navArgs()
 
-    private val attraction: Attraction by lazy {
-        attractions.find { it.id == safeArgs.attractionId }!!
-    }
+//    private val attraction: Attraction by lazy {
+//        attractions.find { it.id == safeArgs.attractionId }!!
+//    }
+  private val attraction = Attraction()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,13 +48,27 @@ class AttractionDetailsFragment : BaseFragment() {
         binding.monthsToVisitTextView.text = attraction.months_to_visit
         binding.numberOfFactsTextView.text = "${attraction.facts.size}facts"
         binding.numberOfFactsTextView.setOnClickListener {
-            //TODO
+            val stringBuilder = StringBuilder("")
+            attraction.facts.forEach {
+                stringBuilder.append("\u2022 $it")
+                stringBuilder.append("\n\n")
+            }
+            val message =
+                stringBuilder.toString().substring(0, stringBuilder.toString().lastIndexOf("\n\n"))
+
+            AlertDialog.Builder(requireContext(), R.style.MyDialog)
+                .setTitle("${attraction.title} Facts")
+                .setMessage(message)
+                .setPositiveButton("ok") { dialog, whitch ->
+
+                }
+                .show()
         }
         setMenu()
     }
 
 
-    private fun setMenu(){
+    private fun setMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -73,7 +89,7 @@ class AttractionDetailsFragment : BaseFragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun setGoogleMaps(){
+    private fun setGoogleMaps() {
         val uri =
             Uri.parse(
                 "geo:${attraction.location.latitude}," +
@@ -83,6 +99,7 @@ class AttractionDetailsFragment : BaseFragment() {
         mapIntent.setPackage("com.google.android.apps.maps")
         startActivity(mapIntent)
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
