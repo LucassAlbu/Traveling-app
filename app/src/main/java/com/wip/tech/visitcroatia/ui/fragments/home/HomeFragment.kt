@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.wip.tech.visitcroatia.R
 import com.wip.tech.visitcroatia.databinding.FragmentHomeBinding
 import com.wip.tech.visitcroatia.ui.fragments.BaseFragment
 
@@ -27,22 +28,20 @@ class HomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val homeAdpter = HomeFragmentAdpter { attractionId ->
-            val navDirections =
-                HomeFragmentDirections.actionHomeFragmentToAttractionDetailsFragment(attractionId)
-            navController.navigate(navDirections)
-
+        val epoxyController = HomeFragmentController { attractionId ->
+         activityViewModel.onAttractionSelected(attractionId)
+            navController.navigate(R.id.action_homeFragment_to_attractionDetailsFragment)
         }
-        binding.recyclerView.adapter = homeAdpter
-        binding.recyclerView.addItemDecoration(
+        binding.epoxyRecyclerView.setController(epoxyController)
+        binding.epoxyRecyclerView.addItemDecoration(
             DividerItemDecoration(
                 requireActivity(),
                 RecyclerView.VERTICAL
             )
         )
-
+        epoxyController.isLoading = true
         activityViewModel.attractionListLiveData.observe(viewLifecycleOwner) { attractions ->
-            homeAdpter.setData(attractions)
+            epoxyController.attractions = attractions
 
         }
     }

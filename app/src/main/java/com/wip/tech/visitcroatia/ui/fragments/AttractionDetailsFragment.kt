@@ -11,7 +11,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.navArgs
 import com.squareup.picasso.Picasso
 import com.wip.tech.visitcroatia.R
-import com.wip.tech.visitcroatia.data.Attraction
 import com.wip.tech.visitcroatia.databinding.FragmentAttractionDetailsBinding
 
 class AttractionDetailsFragment : BaseFragment() {
@@ -19,12 +18,7 @@ class AttractionDetailsFragment : BaseFragment() {
     private var _binding: FragmentAttractionDetailsBinding? = null
     private val binding get() = _binding!!
 
-    private val safeArgs: AttractionDetailsFragmentArgs by navArgs()
 
-//    private val attraction: Attraction by lazy {
-//        attractions.find { it.id == safeArgs.attractionId }!!
-//    }
-  private val attraction = Attraction()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,27 +36,31 @@ class AttractionDetailsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.titleTextView.text = attraction.title
-        binding.descriptionTextView.text = attraction.description
-        Picasso.get().load(attraction.image_urls).into(binding.headerImageView)
-        binding.monthsToVisitTextView.text = attraction.months_to_visit
-        binding.numberOfFactsTextView.text = "${attraction.facts.size}facts"
-        binding.numberOfFactsTextView.setOnClickListener {
-            val stringBuilder = StringBuilder("")
-            attraction.facts.forEach {
-                stringBuilder.append("\u2022 $it")
-                stringBuilder.append("\n\n")
-            }
-            val message =
-                stringBuilder.toString().substring(0, stringBuilder.toString().lastIndexOf("\n\n"))
-
-            AlertDialog.Builder(requireContext(), R.style.MyDialog)
-                .setTitle("${attraction.title} Facts")
-                .setMessage(message)
-                .setPositiveButton("ok") { dialog, whitch ->
-
+        activityViewModel.selectedAttractionLiveData.observe(viewLifecycleOwner) { attraction ->
+            binding.titleTextView.text = attraction.title
+            binding.descriptionTextView.text = attraction.description
+            Picasso.get().load(attraction.image_urls).into(binding.headerImageView)
+            binding.monthsToVisitTextView.text = attraction.months_to_visit
+            binding.numberOfFactsTextView.text = "${attraction.facts.size}facts"
+            binding.numberOfFactsTextView.setOnClickListener {
+                val stringBuilder = StringBuilder("")
+                attraction.facts.forEach {
+                    stringBuilder.append("\u2022 $it")
+                    stringBuilder.append("\n\n")
                 }
-                .show()
+                val message =
+                    stringBuilder.toString()
+                        .substring(0, stringBuilder.toString().lastIndexOf("\n\n"))
+
+                AlertDialog.Builder(requireContext(), R.style.MyDialog)
+                    .setTitle("${attraction.title} Facts")
+                    .setMessage(message)
+                    .setPositiveButton("ok") { dialog, whitch ->
+
+                    }
+                    .show()
+
+            }
         }
         setMenu()
     }
@@ -90,14 +88,9 @@ class AttractionDetailsFragment : BaseFragment() {
     }
 
     private fun setGoogleMaps() {
-        val uri =
-            Uri.parse(
-                "geo:${attraction.location.latitude}," +
-                        "${attraction.location.longitude}?z=9&q=${attraction.title}"
-            )
-        val mapIntent = Intent(Intent.ACTION_VIEW, uri)
-        mapIntent.setPackage("com.google.android.apps.maps")
-        startActivity(mapIntent)
+        val attraction = activityViewModel.selectedAttractionLiveData.value ?: return
+        activityViewModel.locationSelectedLiveData.postValue(attraction)
+
     }
 
     override fun onDestroyView() {
